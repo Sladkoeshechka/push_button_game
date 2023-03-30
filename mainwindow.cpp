@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     this->resize(800, 1600);
-
     recursiveCreateButtonTimeDelay();
 }
 
@@ -21,25 +20,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::recursiveCreateButtonTimeDelay()
 {
-    int animationTime = QRandomGenerator::global()->bounded(animationTimeLowerLimit, animationTimeUpperLimit);
-    int x = QRandomGenerator::global()->bounded(this->width() - buttonSize.width());
-    int y = QRandomGenerator::global()->bounded(moveHeightLimit - buttonSize.height());
-    createButton(x, y, animationTime);
+    createButton();
     int createButtonTime =
             QRandomGenerator::global()->
             bounded(createButtonTimeLowerLimit, createButtonTimeUpperLimit);
-    QTimer::singleShot(createButtonTime, this, [=](){
-        recursiveCreateButtonTimeDelay();
-    });
-}
-
-void MainWindow::createButtonWithFasterAnimation(int x, int y, int animationTime)
-{
+    QTimer::singleShot(createButtonTime, this, &MainWindow::recursiveCreateButtonTimeDelay);
 
 }
 
-void MainWindow::createButton(int x, int y, int animationTime)
+void MainWindow::createButton()
 {
+    int x = QRandomGenerator::global()->bounded(this->width() - buttonSize.width());
+    int y = QRandomGenerator::global()->bounded(moveHeightLimit - buttonSize.height());
+    int animationTime = QRandomGenerator::global()->bounded(animationTimeLowerLimit, animationTimeUpperLimit);
 
     int currentKey = buttonKey++;
     buttonMap[currentKey] = new QPushButton(this);
@@ -67,7 +60,7 @@ void MainWindow::createButton(int x, int y, int animationTime)
     animation->setEndValue(QRect(x, this->height() - buttonSize.height(), buttonSize.width(), buttonSize.height()));
     animation->start();
 
-    QTimer::singleShot(animationTime, this, [=](){
+    QTimer::singleShot(animationTime,[=](){
         if(buttonMap[currentKey]) {
             this->setStyleSheet("background-color: red;");
             qInfo() << "You are a dead man!";

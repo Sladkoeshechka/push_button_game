@@ -15,11 +15,8 @@ public:
     ~MainWindow();
 
 private:
-    void createButton(int x, int y, int animationTime);
-    void deleteButton(QPushButton*&);
+    void createButton();
     void recursiveCreateButtonTimeDelay();
-    void createButtonWithFasterAnimation(int x, int y, int animationTime);
-
     std::map <int, QPushButton*> buttonMap;
     int buttonKey = 0;
 
