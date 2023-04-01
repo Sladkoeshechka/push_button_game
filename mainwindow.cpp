@@ -1,10 +1,7 @@
 #include "mainwindow.h"
 #include <QPushButton>
-#include <QSize>
 #include <QRandomGenerator>
 #include <QTimer>
-#include <QPropertyAnimation>
-#include <QTime>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
