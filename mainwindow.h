@@ -26,6 +26,5 @@ private:
     const int moveHeightLimit = 100;
     const uint32_t createButtonTimeLowerLimit = 100;
     const uint32_t createButtonTimeUpperLimit = 1000;
-
 };
 #endif // MAINWINDOW_H

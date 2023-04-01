@@ -33,11 +33,11 @@ void MainWindow::createButton()
     int x = QRandomGenerator::global()->bounded(this->width() - buttonSize.width());
     int y = QRandomGenerator::global()->bounded(moveHeightLimit - buttonSize.height());
     double animationTime = QRandomGenerator::global()->bounded(animationTimeLowerLimit, animationTimeUpperLimit);
-    const double timerDuration = 5;
+
+    const double timerDuration = 50;
     const int finalYCorrd = this->height() - buttonSize.height();
-    qInfo() << "finalYCoord = " << finalYCorrd;
-    double defaultYShift = (finalYCorrd - y) * (timerDuration) / animationTime;
-    qInfo() << defaultYShift;
+
+    int defaultYShift = static_cast<int>(((finalYCorrd - y) * (timerDuration) / animationTime)) + 1;
     double underMouseYShift = 2 * defaultYShift;
 
     int currentKey = buttonKey++;
@@ -63,9 +63,9 @@ void MainWindow::createButton()
         QPushButton*& currentButton = this->buttonMap[currentKey];
         if (currentButton)
         {
-            if (currentButton->pos().y() == (this->height() - buttonSize.height()))
+            if (currentButton->pos().y() >= (this->height() - buttonSize.height()))
             {
-                qInfo() << "Game is lost!";
+                this->setWindowTitle("Game is lost!");
                 this->setStyleSheet("background-color: red;");
                 currentButton->deleteLater();
                 timer->stop();
@@ -78,6 +78,10 @@ void MainWindow::createButton()
             {
                 currentButton->move(x, currentButton->pos().y() + defaultYShift);
             }
+        }
+        else
+        {
+            timer->stop();
         }
     });
     timer->start(timerDuration);
