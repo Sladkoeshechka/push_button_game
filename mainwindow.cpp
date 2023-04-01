@@ -32,7 +32,13 @@ void MainWindow::createButton()
 {
     int x = QRandomGenerator::global()->bounded(this->width() - buttonSize.width());
     int y = QRandomGenerator::global()->bounded(moveHeightLimit - buttonSize.height());
-    int animationTime = QRandomGenerator::global()->bounded(animationTimeLowerLimit, animationTimeUpperLimit);
+    double animationTime = QRandomGenerator::global()->bounded(animationTimeLowerLimit, animationTimeUpperLimit);
+    const double timerDuration = 5;
+    const int finalYCorrd = this->height() - buttonSize.height();
+    qInfo() << "finalYCoord = " << finalYCorrd;
+    double defaultYShift = (finalYCorrd - y) * (timerDuration) / animationTime;
+    qInfo() << defaultYShift;
+    double underMouseYShift = 2 * defaultYShift;
 
     int currentKey = buttonKey++;
     buttonMap[currentKey] = new QPushButton(this);
@@ -52,19 +58,29 @@ void MainWindow::createButton()
         currentButton = nullptr;
     };
 
-    QObject::connect(button, &QPushButton::clicked, this, deleteButton);
-
-    QPropertyAnimation *animation = new QPropertyAnimation(button, "geometry");
-    animation->setDuration(animationTime);
-    animation->setStartValue(QRect(x, y, buttonSize.width(), buttonSize.height()));
-    animation->setEndValue(QRect(x, this->height() - buttonSize.height(), buttonSize.width(), buttonSize.height()));
-    animation->start();
-
-    QTimer::singleShot(animationTime,[=](){
-        if(buttonMap[currentKey]) {
-            this->setStyleSheet("background-color: red;");
-            qInfo() << "You are a dead man!";
-            deleteButton();
+    QTimer* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [=]() mutable {
+        QPushButton*& currentButton = this->buttonMap[currentKey];
+        if (currentButton)
+        {
+            if (currentButton->pos().y() == (this->height() - buttonSize.height()))
+            {
+                qInfo() << "Game is lost!";
+                this->setStyleSheet("background-color: red;");
+                currentButton->deleteLater();
+                timer->stop();
+            }
+            else if (currentButton->underMouse())
+            {
+                currentButton->move(x, currentButton->pos().y() + underMouseYShift);
+            }
+            else
+            {
+                currentButton->move(x, currentButton->pos().y() + defaultYShift);
+            }
         }
     });
+    timer->start(timerDuration);
+
+    QObject::connect(button, &QPushButton::clicked, this, deleteButton);
 }
